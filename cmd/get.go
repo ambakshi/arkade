@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strconv"
@@ -26,8 +27,8 @@ func MakeGet() *cobra.Command {
 	var command = &cobra.Command{
 		Use:   "get",
 		Short: `The get command downloads a tool`,
-		Long: `The get command downloads a CLI or application from the specific tool's 
-releases or downloads page. The tool is usually downloaded in binary format 
+		Long: `The get command downloads a CLI or application from the specific tool's
+releases or downloads page. The tool is usually downloaded in binary format
 and provides a fast and easy alternative to a package manager.`,
 		Example: `  arkade get helm
   arkade get linkerd2 --stash=false
@@ -106,7 +107,12 @@ and provides a fast and easy alternative to a package manager.`,
 			}
 		}()
 
-		outFilePath, finalName, err := get.Download(tool, arch, operatingSystem, version, dlMode, progress)
+		tempDir, err := ioutil.TempDir("", tool.Name)
+		if err != nil {
+			return fmt.Errorf("Unable to create temporary directory")
+		}
+
+		outFilePath, finalName, err := get.Download(tool, arch, operatingSystem, version, tempDir, dlMode, progress)
 
 		if err != nil {
 			return err
@@ -132,6 +138,7 @@ sudo mv %s /usr/local/bin/
 
 `, finalName, outFilePath, outFilePath)
 
+			os.RemoveAll(tempDir)
 		}
 		return err
 	}

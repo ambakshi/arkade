@@ -6,6 +6,7 @@ package helm
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -63,7 +64,12 @@ func DownloadHelm(userPath, clientArch, clientOS, subdir string) error {
 
 	if _, err := os.Stat(fmt.Sprintf("%s", env.LocalBinary(tool.Name, ""))); errors.Is(err, os.ErrNotExist) {
 
-		outPath, finalName, err := get.Download(tool, clientArch, clientOS, tool.Version, get.DownloadArkadeDir, false)
+		tempDir, err := ioutil.TempDir("", tool.Name)
+		if err != nil {
+			return err
+		}
+		defer os.RemoveAll(tempDir)
+		outPath, finalName, err := get.Download(tool, clientArch, clientOS, tool.Version, tempDir, get.DownloadArkadeDir, false)
 		if err != nil {
 			return err
 		}

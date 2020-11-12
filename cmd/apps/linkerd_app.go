@@ -146,7 +146,11 @@ func downloadLinkerd(userPath, arch, clientOS, version string) error {
 
 	if _, err := os.Stat(fmt.Sprintf("%s", env.LocalBinary(tool.Name, ""))); errors.Is(err, os.ErrNotExist) {
 
-		outPath, finalName, err := get.Download(tool, arch, clientOS, version, get.DownloadArkadeDir, false)
+		tempDir, err := ioutil.TempDir("", tool.Name)
+		if err != nil {
+			return err
+		}
+		outPath, finalName, err := get.Download(tool, arch, clientOS, version, tempDir, get.DownloadArkadeDir, false)
 		if err != nil {
 			return err
 		}

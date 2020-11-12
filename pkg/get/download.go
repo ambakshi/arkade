@@ -20,7 +20,7 @@ const (
 	DownloadArkadeDir = iota
 )
 
-func Download(tool *Tool, arch, operatingSystem, version string, downloadMode int, displayProgress bool) (string, string, error) {
+func Download(tool *Tool, arch, operatingSystem, version, tempDir string, downloadMode int, displayProgress bool) (string, string, error) {
 
 	downloadURL, err := GetDownloadURL(tool, strings.ToLower(operatingSystem), strings.ToLower(arch), version)
 	if err != nil {
@@ -28,7 +28,7 @@ func Download(tool *Tool, arch, operatingSystem, version string, downloadMode in
 	}
 
 	fmt.Println(downloadURL)
-	outFilePath, err := downloadFile(downloadURL, displayProgress)
+	outFilePath, err := downloadFile(downloadURL, tempDir, displayProgress)
 	if err != nil {
 		return "", "", err
 	}
@@ -98,7 +98,7 @@ func Download(tool *Tool, arch, operatingSystem, version string, downloadMode in
 	return outFilePath, finalName, nil
 }
 
-func downloadFile(downloadURL string, displayProgress bool) (string, error) {
+func downloadFile(downloadURL, tempDir string, displayProgress bool) (string, error) {
 	res, err := http.DefaultClient.Get(downloadURL)
 	if err != nil {
 		return "", err
@@ -113,8 +113,7 @@ func downloadFile(downloadURL string, displayProgress bool) (string, error) {
 	}
 
 	_, fileName := path.Split(downloadURL)
-	tmp := os.TempDir()
-	outFilePath := path.Join(tmp, fileName)
+	outFilePath := path.Join(tempDir, fileName)
 	wrappedReader := withProgressBar(res.Body, int(res.ContentLength), displayProgress)
 	out, err := os.Create(outFilePath)
 	if err != nil {
