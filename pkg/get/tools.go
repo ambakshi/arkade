@@ -56,15 +56,15 @@ https://get.helm.sh/helm-{{.Version}}-{{$os}}-{{$arch}}.{{$ext}}`,
 	{{- if eq .Arch "x86_64" -}}
 	{{$arch = "amd64"}}
 	{{- end -}}
-	
+
 	{{$os := .OS}}
 	{{$ext := ""}}
-	
+
 	{{ if HasPrefix .OS "ming" -}}
 	{{$os = "windows"}}
 	{{$ext = ".exe"}}
 	{{- end -}}
-	
+
 	https://github.com/roboll/helmfile/releases/download/v{{.Version}}/helmfile_{{$os}}_{{$arch}}{{$ext}}`,
 		})
 
@@ -321,13 +321,13 @@ https://github.com/inlets/inletsctl/releases/download/{{.Version}}/{{$fileName}}
 		{{- else if eq .OS "darwin" -}}
 		{{$osStr = "darwin"}}
 		{{- end -}}
-			
+
 		{{$archStr := ""}}
 		{{- if eq .Arch "x86_64" -}}
 		{{$archStr = "amd64"}}
-		{{- end -}}		
+		{{- end -}}
 
-		{{$archiveStr := ""}}		
+		{{$archiveStr := ""}}
 		{{ if HasPrefix .OS "ming" -}}
 		{{$archiveStr = "zip"}}
 		{{- else -}}
@@ -356,7 +356,7 @@ https://github.com/inlets/inletsctl/releases/download/{{.Version}}/{{$fileName}}
 		{{$archStr := .Arch}}
 		{{- if eq .Arch "armv7l" -}}
 		{{$archStr = "arm"}}
-		{{- end -}}		
+		{{- end -}}
 https://github.com/{{.Owner}}/{{.Repo}}/releases/download/{{.Version}}/{{.Name}}_{{$osStr}}_{{$archStr}}.tar.gz`,
 		})
 
@@ -388,17 +388,17 @@ https://github.com/{{.Owner}}/{{.Repo}}/releases/download/{{.Version}}/{{.Name}}
 		{{$archStr = "arm"}}
 		{{- else if eq .Arch "x86_64" -}}
 		{{$archStr = "amd64"}}
-		{{- end -}}		
+		{{- end -}}
 https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/{{.Name}}-{{.Version}}-{{$osStr}}-{{$archStr}}.{{$extStr}}`,
 		})
 
 	// https://releases.hashicorp.com/terraform/0.13.1/terraform_0.13.1_linux_amd64.zip
-	tools = append(tools,
-		Tool{
+	hashitool := func(name, version string) Tool {
+		return Tool{
 			Owner:   "hashicorp",
-			Repo:    "terraform",
-			Name:    "terraform",
-			Version: "0.13.1",
+			Repo:    "hashicorp",
+			Name:    name,
+			Version: version,
 			URLTemplate: `{{$arch := .Arch}}
 
 {{- if eq .Arch "x86_64" -}}
@@ -412,7 +412,14 @@ https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/{{.Name}
 {{$os = "windows"}}
 {{- end -}}
 
-https://releases.hashicorp.com/terraform/{{.Version}}/terraform_{{.Version}}_{{$os}}_{{$arch}}.zip`})
+https://releases.hashicorp.com/{{.Name}}/{{.Version}}/{{.Name}}_{{.Version}}_{{$os}}_{{$arch}}.zip`}
+	}
+
+	tools = append(tools, hashitool("terraform", "0.13.5"))
+	tools = append(tools, hashitool("nomad", "0.12.8"))
+	tools = append(tools, hashitool("consul", "1.8.5"))
+	tools = append(tools, hashitool("vault", "1.5.5"))
+	tools = append(tools, hashitool("packer", "1.6.5"))
 
 	tools = append(tools,
 		Tool{
@@ -442,7 +449,7 @@ https://releases.hashicorp.com/terraform/{{.Version}}/terraform_{{.Version}}_{{$
 	{{$archStr = "arm64"}}
 	{{- else if eq .Arch "x86_64" -}}
 	{{$archStr = "amd64"}}
-	{{- end -}}		
+	{{- end -}}
 https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/gh_{{.Version}}_{{$osStr}}_{{$archStr}}.{{$extStr}}`,
 		})
 
@@ -479,12 +486,12 @@ https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/pack-v{{
 			Version:        "0.4.2",
 			BinaryTemplate: `buildx`,
 			URLTemplate: `
-		
+
 				{{$extStr := ""}}
 				{{ if HasPrefix .OS "ming" -}}
 				{{$extStr = ".exe"}}
 				{{- end -}}
-		
+
 				{{$osStr := ""}}
 				{{ if HasPrefix .OS "ming" -}}
 				{{$osStr = "windows"}}
@@ -493,7 +500,7 @@ https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/pack-v{{
 				{{- else if eq .OS "darwin" -}}
 				{{$osStr = "darwin"}}
 				{{- end -}}
-		
+
 				{{$archStr := .Arch}}
 				{{- if eq .Arch "armv6l" -}}
 				{{$archStr = "arm-v6"}}
@@ -501,7 +508,7 @@ https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/pack-v{{
 				{{$archStr = "arm-v7"}}
 				{{- else if eq .Arch "x86_64" -}}
 				{{$archStr = "amd64"}}
-				{{- end -}}		
+				{{- end -}}
 		https://github.com/{{.Owner}}/{{.Repo}}/releases/download/v{{.Version}}/{{.Name}}-v{{.Version}}.{{$osStr}}-{{$archStr}}{{$extStr}}`,
 		})
 
